@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type ListNode struct {
 	Val  int
@@ -10,44 +8,69 @@ type ListNode struct {
 }
 
 func addTwoNumbers(l1 *ListNode, l2 *ListNode) *ListNode {
-	ans := new(ListNode)
-	chain(recursion(l1, 0, 0) + recursion(l2, 0, 0), ans)
-	return ans
-}
-
-func chain(num int, l *ListNode) {
-	n := num % 10
-	if n == 0 && num < 10 {
-		l.Val = num
-		l.Next = nil
-		return
-	}
-	l.Val = n
-	num = (num - n) / 10
-	l.Next = new(ListNode)
-	chain(num, l.Next)
-}
-
-func recursion(l *ListNode, depth, ret int) int {
-	if l.Next == nil {
-		return l.Val * pow(10, depth) + ret
-	}
-	ret += l.Val * pow(10, depth)
-	depth++
-	return recursion(l.Next, depth, ret)
-}
-
-func pow(base, p int) int {
-	ret := 1
-	for i := 0; i < p; i++ {
-		ret *= base
+	var ret, head *ListNode
+	//buf := make([]int, 0, 100)
+	var more int
+	for {
+		if l1 == nil && l2 == nil && more == 0 {
+			break
+		}
+		var v1, v2 int
+		if l1 != nil {
+			v1 = l1.Val
+			l1 = l1.Next
+		}
+		if l2 != nil {
+			v2 = l2.Val
+			l2 = l2.Next
+		}
+		s := v1 + v2 + more
+		if s >= 10 {
+			s = s - 10
+			more = 1
+		} else {
+			more = 0
+		}
+		if ret == nil {
+			head = &ListNode{Val: s}
+			ret = head
+		} else {
+			head.Next = &ListNode{Val: s}
+			head = head.Next
+		}
 	}
 	return ret
 }
 
+func chain(nums []int) *ListNode {
+	var ret = &ListNode{Val: nums[len(nums)-1]}
+	for i:=len(nums)-2; i >= 0 ; i-- {
+		node := &ListNode{
+			Val: nums[i],
+			Next: ret,
+		}
+		ret = node
+	}
+	return ret
+}
+
+func printNode(l *ListNode) {
+	if l == nil {
+		fmt.Println()
+		return
+	}
+	fmt.Print(l.Val, " ")
+	printNode(l.Next)
+}
+
 func main()  {
-	l := new(ListNode)
-	chain(465, l)
-	fmt.Println(l)
-	fmt.Println(recursion(l, 0, 0))
+	nums1 := []int{9,9,9,9,9,9,9}
+	l1 := chain(nums1)
+	printNode(l1)
+
+	nums2 := []int{9,9,9,9}
+	l2 := chain(nums2)
+	printNode(l2)
+
+	printNode(addTwoNumbers(l1,l2))
 }
